@@ -27,16 +27,12 @@ if submit and input_text:
     st.session_state["Chat_history"].append(("You", input_text))
     st.subheader("The Response is")
     for chunk in response:
-       text = chunk.text
-       if not isinstance(text, str):
-        text = str(text)
-
-        st.code(text)
-
+        st.write(chunk.text)
+        
         st.session_state["Chat_history"].append(("Bot", chunk.text))
 
 st.subheader("Chat History")
 for role, text in st.session_state["Chat_history"]:
-    st.code(f"{role}: {text}")
+    st.write(f"{role}: {text}")
 
 
