@@ -27,7 +27,12 @@ if submit and input_text:
     st.session_state["Chat_history"].append(("You", input_text))
     st.subheader("The Response is")
     for chunk in response:
-        st.write(chunk.text)
+       text = chunk.text
+       if not isinstance(text, str):
+        text = str(text)
+
+        st.code(text)
+
         st.session_state["Chat_history"].append(("Bot", chunk.text))
 
 st.subheader("Chat History")
