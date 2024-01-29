@@ -1,9 +1,3 @@
 streamlit
 google-generativeai
 python-dotenv
-streamlit_chat
-langchain
-chromadb
-PyPDF2
-faiss-cpu
-langchain-google-genai
