@@ -1,9 +1,12 @@
 streamlit
 google-generativeai
 python-dotenv
+<<<<<<< HEAD
 streamlit_chat
 langchain
 chromadb
 PyPDF2
 faiss-cpu
 langchain-google-genai
+=======
+>>>>>>> 3969112951139e885af9553d51eedd42d20efff2
