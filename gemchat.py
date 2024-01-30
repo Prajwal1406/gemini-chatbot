@@ -49,7 +49,7 @@ def maha():
     #     for role, text in st.session_state["Chat_history"]:
     #         st.write(f"{role}: {text}")
 
-    elif raddi == "Doc Chat":
+    if raddi == "Doc Chat":
         def get_pdf_text(pdf_docs):
             text = ""
             for pdf in pdf_docs:
