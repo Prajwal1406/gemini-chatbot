@@ -21,7 +21,7 @@ def maha():
     
     raddi = st.sidebar.radio("Chat With P.A", ["Text Chat", "Doc Chat","Image Chat"])
     with st.sidebar:
-        temprature= st.slider("How much creative you want",0.0,1.0,0.1)
+        temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
     if raddi == "Doc Chat":
         def get_pdf_text(pdf_docs):
@@ -53,7 +53,7 @@ def maha():
 
             Answer:
             """
-            model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=temprature)  
+            model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=temperature)  
             prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
             chain = load_qa_chain(model, chain_type='stuff', prompt=prompt)
             return chain
@@ -71,13 +71,11 @@ def maha():
             )
             st.write("Reply: ", response["output_text"])
 
-        # st.set_page_config("Chat Pdf")
         st.header("Chat with the pdfs")
         user_question = st.text_input("Ask a question from Pdf files")
         if user_question:
             user_input(user_question)
         with st.sidebar:
-            
             st.title("Chat with pdfs")
             pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
             if st.button("submit & process"):
@@ -91,46 +89,43 @@ def maha():
 
         def get_gemini_response(input_prompt, image):
             model = genai.GenerativeModel('gemini-pro-vision')
-            response = model.generate_content([input_prompt,image[0]])
-            return response.text
+            response = model.generate_content([input_prompt, image[0]])
+            return response
 
         def input_image_setup(uploaded_file):
             if uploaded_file is not None:
                 bytes_data = uploaded_file.getvalue()
-
                 image_parts = [
                     {
-                        "mime_type" : uploaded_file.type,
+                        "mime_type": uploaded_file.type,
                         "data": bytes_data
                     }
                 ]
                 return image_parts
             else:
                 raise FileNotFoundError("No file uploaded")
-            
 
         st.header("Chat with the image")
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg","jpeg","png"])
         if uploaded_file is None:
-            uploaded_file= st.camera_input("Take Photo")
+            uploaded_file = st.camera_input("Take Photo")
         image = ""
         if uploaded_file is not None:
-            
             image = Image.open(uploaded_file)
-            st.image(image,caption="Uploaded Image", use_column_width=True)
-            
+            st.image(image, caption="Uploaded Image", use_column_width=True)
+
         submit = st.button("Tell me about the Image")
-        input = st.text_input("Type Your Query About The image",key=101)
-        input_prompte= """
+        input_text = st.text_input("Type Your Query About The image", key=101)
+        input_prompt = f"""
         You are an expert in all the domains 
         explain detailed information about the image 
+        {input_text}
         """
-        input_prompt = input_prompte + input
         if submit:
-            image_data=input_image_setup(uploaded_file)
-            response = get_gemini_response(input_prompt,image_data)
+            image_data = input_image_setup(uploaded_file)
+            response = get_gemini_response(input_prompt, image_data)
             st.header("The Response is")
-            st.write(response)
+            st.write(response.text)
 
     elif raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
@@ -140,7 +135,6 @@ def maha():
             response = chat.send_message(question, stream=True)
             return response
 
-        # st.set_page_config(page_title="Q&A gemini")
         st.header("Prajwals Pa")
 
         if 'Chat_history' not in st.session_state:
