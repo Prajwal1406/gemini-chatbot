@@ -22,36 +22,8 @@ def maha():
     raddi = st.sidebar.radio("Chat With P.A", ["Text Chat", "Doc Chat","Image Chat"])
     with st.sidebar:
         temprature= st.slider("How much creative you want",0.0,1.0,0.1)
-    if raddi == "Text Chat":
-        model = genai.GenerativeModel("gemini-pro")
-        chat = model.start_chat(history=[])
 
-        def get_gemini_response(question):
-            response = chat.send_message(question, stream=True)
-            return response
-
-        # st.set_page_config(page_title="Q&A gemini")
-        st.header("Prajwals Pa")
-
-        if 'Chat_history' not in st.session_state:
-            st.session_state['Chat_history'] = []
-
-        input_text = st.text_area("Input:", key=101)
-        submit = st.button("Get Your Answer")
-
-        if submit and input_text:
-            response = get_gemini_response(input_text)
-            st.session_state["Chat_history"].append(("You", input_text))
-            st.subheader("The Response is")
-            for chunk in response:
-                st.write(chunk.text)
-                st.session_state["Chat_history"].append(("Bot", chunk.text))
-
-        st.subheader("Chat History")
-        for role, text in st.session_state["Chat_history"]:
-            st.write(f"{role}: {text}")
-
-    elif raddi == "Doc Chat":
+    if raddi == "Doc Chat":
         def get_pdf_text(pdf_docs):
             text = ""
             for pdf in pdf_docs:
@@ -159,6 +131,35 @@ def maha():
             response = get_gemini_response(input_prompt,image_data)
             st.header("The Response is")
             st.write(response)
+
+    elif raddi == "Text Chat":
+        model = genai.GenerativeModel("gemini-pro")
+        chat = model.start_chat(history=[])
+
+        def get_gemini_response(question):
+            response = chat.send_message(question, stream=True)
+            return response
+
+        # st.set_page_config(page_title="Q&A gemini")
+        st.header("Prajwals Pa")
+
+        if 'Chat_history' not in st.session_state:
+            st.session_state['Chat_history'] = []
+
+        input_text = st.text_area("Input:", key=101)
+        submit = st.button("Get Your Answer")
+
+        if submit and input_text:
+            response = get_gemini_response(input_text)
+            st.session_state["Chat_history"].append(("You", input_text))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.write(chunk.text)
+                st.session_state["Chat_history"].append(("Bot", chunk.text))
+
+        st.subheader("Chat History")
+        for role, text in st.session_state["Chat_history"]:
+            st.write(f"{role}: {text}")
 
 if __name__ == "__main__":
     maha()
