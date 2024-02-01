@@ -106,7 +106,7 @@ def maha():
                 raise FileNotFoundError("No file uploaded")
 
         st.header("Chat with the image")
-        uploaded_file = st.file_uploader("Choose an image...",accept_multiple_files=True, type=["jpg","jpeg","png"])
+        uploaded_file = st.file_uploader("Choose an image...",accept_multiple_files=False, type=["jpg","jpeg","png"])
         if uploaded_file is None:
             uploaded_file = st.camera_input("Take Photo")
         image = ""
@@ -125,7 +125,7 @@ def maha():
             image_data = input_image_setup(uploaded_file)
             response = get_gemini_response(input_prompt, image_data)
             st.header("The Response is")
-            st.write(response.text)
+            st. markdown(response.text)
 
     elif raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
