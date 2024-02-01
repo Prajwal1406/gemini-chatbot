@@ -106,7 +106,7 @@ def maha():
                 raise FileNotFoundError("No file uploaded")
 
         st.header("Chat with the image")
-        uploaded_file = st.file_uploader("Choose an image...",accept_multiple_files=False, type=["jpg","jpeg","png"])
+        uploaded_file = st.file_uploader("Choose an image...",type=["jpg","jpeg","png"])
         if uploaded_file is None:
             uploaded_file = st.camera_input("Take Photo")
         image = ""
