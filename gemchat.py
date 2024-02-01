@@ -89,7 +89,7 @@ def maha():
 
         def get_gemini_response(input_prompt, image):
             model = genai.GenerativeModel('gemini-pro-vision')
-            response = model.generate_content([input_prompt, image[0]])
+            response = model.generate_content([input_prompt, image_data])
             return response
 
         def input_image_setup(uploaded_file):
@@ -97,7 +97,7 @@ def maha():
                 bytes_data = uploaded_file.getvalue()
                 image_parts = [
                     {
-                        "mime_type": uploaded_file.type,
+                        "mime_type": uploaded_file.name,
                         "data": bytes_data
                     }
                 ]
