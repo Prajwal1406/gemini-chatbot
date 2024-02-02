@@ -148,7 +148,7 @@ def maha():
             st.session_state["Chat_history"].append(("You", input_text))
             st.subheader("The Response is")
             for chunk in response:
-                st.write(chunk.text)
+                st.markdown(chunk.text)
                 st.session_state["Chat_history"].append(("Bot", chunk.text))
 
         st.subheader("Chat History")
