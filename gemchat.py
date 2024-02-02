@@ -84,48 +84,6 @@ def maha():
                     text_chunks = get_text_chunks(raw_text)
                     get_vector_store(text_chunks)
                     st.success("Done")
-    elif raddi == "Image Chat":
-        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-        def get_gemini_response(input_prompt, image):
-            model = genai.GenerativeModel('gemini-pro-vision')
-            response = model.generate_content([input_prompt, image[0]])
-            return response
-
-        def input_image_setup(uploaded_file):
-            if uploaded_file is not None:
-                bytes_data = uploaded_file.getvalue()
-                image_parts = [
-                    {
-                        "mime_type": uploaded_file.name,
-                        "data": bytes_data
-                    }
-                ]
-                return image_parts
-            else:
-                raise FileNotFoundError("No file uploaded")
-
-        st.header("Chat with the image")
-        uploaded_file = st.file_uploader("Choose an image...",type=["jpg","jpeg","png"])
-        if uploaded_file is None:
-            uploaded_file = st.camera_input("Take Photo")
-        image = ""
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_column_width=True)
-
-        submit = st.button("Tell me about the Image")
-        input_text = st.text_input("Type Your Query About The image", key=101)
-        input_prompt = f"""
-        You are an expert in all the domains 
-        explain detailed information about the image 
-        {input_text}
-        """
-        if submit:
-            image_data = input_image_setup(uploaded_file)
-            response = get_gemini_response(input_prompt, image_data)
-            st.header("The Response is")
-            st. markdown(response.text)
 
     elif raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
@@ -154,6 +112,43 @@ def maha():
         st.subheader("Chat History")
         for role, text in st.session_state["Chat_history"]:
             st.write(f"{role}: {text}")
+
+    elif raddi == "Image Chat":
+        # Function to prepare image data
+        def prepare_image_data(uploaded_file):
+            if uploaded_file is not None:
+                image = Image.open(uploaded_file)
+                return image
+            else:
+                raise FileNotFoundError("No file uploaded")
+
+        # Function to get Gemini response using image data
+        def get_gemini_response(input_prompt, image_data):
+            model = genai.GenerativeModel('gemini-pro-vision')
+            response = model.generate_content([input_prompt, image_data])
+            return response
+
+        st.header("Chat with the Image")
+        uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+        if uploaded_file is None:
+            uploaded_file = st.camera_input("Take Photo")
+
+        if uploaded_file is not None:
+            image = prepare_image_data(uploaded_file)
+            st.image(image, caption="Uploaded Image", use_column_width=True)
+
+            submit = st.button("Tell me about the Image")
+            input_text = st.text_input("Type Your Query About The Image", key=101)
+            input_prompt = f"""
+            You are an expert in all domains. Please explain detailed information about the image: {input_text}
+            """
+            if submit:
+                response = get_gemini_response(input_prompt, image)
+                st.header("The Response is")
+                st.markdown(response.text)
+
+
 
 if __name__ == "__main__":
     maha()
