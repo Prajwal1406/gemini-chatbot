@@ -15,7 +15,9 @@ import os
 
 load_dotenv()
 
-api_key = os.getenv("GOOGLE_API_KEY")
+#api_key = os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = "AIzaSyAEQpWaM1zTsDPEhasLl2SVcb58f3ygrOs"
+genai.configure(api_key=GOOGLE_API_KEY)
 def maha():
     
     raddi = st.sidebar.radio("Chat With P.A", ["Text Chat", "Doc Chat","Image Chat"])
