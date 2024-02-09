@@ -91,7 +91,7 @@ def maha():
     st.subheader("Chat History")
     for role, text in chat_history:
         st.write(f"{role}: {text}")
-    elif raddi == "Text Chat":
+    if raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
         chat = model.start_chat(history=[])
 
