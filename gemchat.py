@@ -1,5 +1,5 @@
 import streamlit as st
-#from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader
 import google.generativeai as genai
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
@@ -11,7 +11,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from dotenv import load_dotenv
 from importlib.metadata import distribution, metadata, version
 from PIL import Image
-from pdfplumber import PdfReader
+#from pdfplumber import PdfReader
 from haystack.preprocessor.utils import RecursiveCharacterTextSplitter
 from haystack.document_store.faiss import FAISSDocumentStore
 from haystack.retriever.dense import DensePassageRetriever
