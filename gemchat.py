@@ -90,7 +90,7 @@ def maha():
         model = genai.GenerativeModel("gemini-pro")
         chat = model.start_chat(history=[])
 
-        def get_gemini_response(question):
+        def get_gemini_response(question,hist):
             response = chat.send_message(question, stream=True)
             return response
 
@@ -103,7 +103,7 @@ def maha():
         submit = st.button("Get Your Answer")
 
         if submit and input_text:
-            response = get_gemini_response(input_text)
+            response = get_gemini_response(input_text,st.session_state["Chat_history"])
             st.session_state["Chat_history"].append(("You", input_text))
             st.subheader("The Response is")
             for chunk in response:
