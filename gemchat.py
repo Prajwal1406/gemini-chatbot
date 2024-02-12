@@ -64,8 +64,7 @@ def maha():
         def get_conversational_chain():
         
             prompt_template = """
-            Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+            Answer the question as detailed as possible from the provided context, make sure to provide all the details, and you are expert in all domains and do as the user asks like summarise the context if asked, explain context if asked , shorten the cotexand explain briefly if asked and many more dont just stick to very narrow context
     Context:\n {context}?\n
     Question: \n{question}\n
 
