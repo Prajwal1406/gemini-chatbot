@@ -64,7 +64,8 @@ def maha():
             model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=temperature)
             PromptTemplate(template=prompt_template, input_variables=['context', 'question'])
             # Adjust your chain setup here
-            return None  # Adjust this line based on your chain setup
+            chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
+            return chain # Adjust this line based on your chain setup
     
         def user_input(user_question, temperature):
             your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embedding-001')
