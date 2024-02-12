@@ -103,7 +103,7 @@ def get_text_chunks(text):
 def get_vector_store(text_chunks):
     embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
     vector_store = FAISS.from_texts(text_chunks,embeddings=embeddings)
-    vector_store.save_local('faiss_index)
+    vector_store.save_local('faiss_index')
 
 def get_conversational_chain():
     prompt_template="""
