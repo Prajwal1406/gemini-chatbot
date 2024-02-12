@@ -27,8 +27,8 @@ genai.configure(api_key=GOOGLE_API_KEY)
 def maha():
     
     raddi = st.sidebar.radio("Chat With P.A", ["Text Chat", "Doc Chat","Image Chat"])
-    with st.sidebar:
-        temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
+    # with st.sidebar:
+    #     temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
     if raddi == "Doc Chat":
         with st.sidebar:
