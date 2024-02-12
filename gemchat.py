@@ -103,12 +103,13 @@ def maha():
 
         if 'Chat_history' not in st.session_state:
             st.session_state['Chat_history'] = []
+            hist = st.session_state['Chat_history']
 
         input_text = st.text_area("Input:", key=101)
         submit = st.button("Get Your Answer",key = 103)
 
         if submit and input_text:
-            response = get_gemini_response(input_text,st.session_state["Chat_history"])
+            response = get_gemini_response(input_text,hist)
             st.session_state["Chat_history"].append(("You", input_text))
             st.subheader("The Response is")
             for chunk in response:
