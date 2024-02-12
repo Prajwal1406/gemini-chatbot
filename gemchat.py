@@ -30,6 +30,10 @@ def maha():
     with st.sidebar:
         temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
+    if raddi == "Doc Chat":
+        with st.sidebar:
+            temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
+
     @st.cache(allow_output_mutation=True)
     def get_pdf_text(pdf_docs):
         text = ""
@@ -38,46 +42,48 @@ def maha():
             for page in pdf_reader.pages:
                 text += page.extract_text()
         return text
-    
+
     @st.cache(allow_output_mutation=True)
     def get_text_chunks(text):
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
-        chunks = text_splitter.split_text(text)
+        chunk_size = 10000
+        chunk_overlap = 1000
+        chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size - chunk_overlap)]
         return chunks
-    
+
     @st.cache(allow_output_mutation=True)
     def get_vector_store(text_chunks):
-        your_embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
         vector_store = FAISS.from_texts(text_chunks, embeddings=your_embeddings)
         vector_store.save_local('faiss_index')
-    
-    def get_conversational_chain():
-        prompt_template="""
+        return vector_store
+
+    def get_conversational_chain(temperature):
+        prompt_template = """
             Answer the question as detailed as possible from the provided context
             """
-        model = ChatGoogleGenerativeAI(model="gemini-pro",temprature= temperature)
-        PromptTemplate(template=prompt_template,input_variables=['context','question'])
-        chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
-        return chain
-    
-    def user_input(user_question):
-        your_embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-        new_db=FAISS.load_local("faiss_index",embeddings)
-        docs=new_db.similarity_search(user_question)
-        chain=get_conversational_chain()
-    
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=temperature)
+        PromptTemplate(template=prompt_template, input_variables=['context', 'question'])
+        # Adjust your chain setup here
+        return None  # Adjust this line based on your chain setup
+
+    def user_input(user_question, temperature):
+        your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        new_db = FAISS.load_local("faiss_index", embeddings=your_embeddings)
+        docs = new_db.similarity_search(user_question)
+        chain = get_conversational_chain(temperature)
+
         response = chain(
-        {"input_documents":docs,"question":user_question}
-        , return_only_outputs = True
+            {"input_documents": docs, "question": user_question},
+            return_only_outputs=True
         )
         st.write("Reply: ", response["output_text"])
-        
-    if raddi == "Doc Chat":
+
         st.header("Chat with Multiple pdfs")
         user_question = st.text_input("Ask a question from Pdf files")
-        
+    
         st.sidebar.title("Chat with pdfs")
         pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+    
         if st.button("submit & process"):
             with st.spinner("Processing..."):
                 if pdf_docs:
@@ -85,6 +91,8 @@ def maha():
                     text_chunks = get_text_chunks(raw_text)
                     get_vector_store(text_chunks)
                     st.success("Done")
+                    if user_question:
+                        user_input(user_question, temperature)
         
         
     elif raddi == "Text Chat":
