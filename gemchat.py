@@ -77,20 +77,20 @@ def maha():
                     chain = get_conversational_chain()
                     st.success("Done")
 
-    st.header("Text Chat")
-    chat_history = st.session_state.get("Chat_history", [])
-    input_text = st.text_area("Input:")
-    submit = st.button("Get Your Answer")
-    if submit and input_text:
-        response = get_gemini_response(input_text, chat_history)
-        st.subheader("The Response is")
-        for chunk in response:
-            st.markdown(chunk.text)
-            chat_history.append(("Bot", chunk.text))
+    # st.header("Text Chat")
+    # chat_history = st.session_state.get("Chat_history", [])
+    # input_text = st.text_area("Input:")
+    # submit = st.button("Get Your Answer")
+    # if submit and input_text:
+    #     response = get_gemini_response(input_text, chat_history)
+    #     st.subheader("The Response is")
+    #     for chunk in response:
+    #         st.markdown(chunk.text)
+    #         chat_history.append(("Bot", chunk.text))
 
-    st.subheader("Chat History")
-    for role, text in chat_history:
-        st.write(f"{role}: {text}")
+    # st.subheader("Chat History")
+    # for role, text in chat_history:
+    #     st.write(f"{role}: {text}")
     elif raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
         chat = model.start_chat(history=[])
