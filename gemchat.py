@@ -84,125 +84,125 @@ def maha():
 # from haystack.document_store.faiss import FAISSDocumentStore
 # import genai
 
-@st.cache(allow_output_mutation=True)
-def get_pdf_text(pdf_docs):
-    text = ""
-    for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-    return text
-
-@st.cache(allow_output_mutation=True)
-def get_text_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
-    chunks = text_splitter.split(text)
-    return chunks
-
-@st.cache(allow_output_mutation=True)
-def get_vector_store(text_chunks):
-    embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-    vector_store = FAISS.from_texts(text_chunks,embeddings=embeddings)
-    vector_store.save_local('faiss_index')
-
-def get_conversational_chain():
-    prompt_template="""
-        Answer the question as detailed as possible from the provided context
-        """
-    model = ChatGoogleGenerativeAI(model="gemini-pro",temprature= temperature)
-    PromptTemplate(template=prompt_template,input_variables=['context','question'])
-    chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
-    return chain
-
-def user_input(user_question):
-    embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-    new_db=FAISS.load_local("faiss_index",embeddings)
-    docs=new_db.similarity_search(user_question)
-    chain=get_conversational_chain()
-
-    response = chain(
-    {"input_documents":docs,"question":user_question}
-    , return_only_outputs = True
-    )
-    st.write("Reply: ", response["output_text"])
+    @st.cache(allow_output_mutation=True)
+    def get_pdf_text(pdf_docs):
+        text = ""
+        for pdf in pdf_docs:
+            pdf_reader = PdfReader(pdf)
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+        return text
     
-if raddi == "Pdf Chat":
-    st.header("Chat with Multiple pdfs")
-    user_question = st.text_input("Ask a question from Pdf files")
+    @st.cache(allow_output_mutation=True)
+    def get_text_chunks(text):
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
+        chunks = text_splitter.split(text)
+        return chunks
     
-    st.sidebar.title("Chat with pdfs")
-    pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
-    if st.button("submit & process"):
-        with st.spinner("Processing..."):
-            if pdf_docs:
-                raw_text = get_pdf_text(pdf_docs)
-                text_chunks = get_text_chunks(raw_text)
-                get_vector_store(text_chunks)
-                st.success("Done")
+    @st.cache(allow_output_mutation=True)
+    def get_vector_store(text_chunks):
+        embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        vector_store = FAISS.from_texts(text_chunks,embeddings=embeddings)
+        vector_store.save_local('faiss_index')
     
+    def get_conversational_chain():
+        prompt_template="""
+            Answer the question as detailed as possible from the provided context
+            """
+        model = ChatGoogleGenerativeAI(model="gemini-pro",temprature= temperature)
+        PromptTemplate(template=prompt_template,input_variables=['context','question'])
+        chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
+        return chain
     
-elif raddi == "Text Chat":
-    model = genai.GenerativeModel("gemini-pro")
-    chat = model.start_chat(history=[])
-
-    def get_gemini_response(question):
-        response = chat.send_message(question, stream=True)
-        return response
-
-    st.header("Prajwals Pa")
-
-    if 'Chat_history' not in st.session_state:
-        st.session_state['Chat_history'] = []
-
-    input_text = st.text_area("Input:", key=101)
-    submit = st.button("Get Your Answer",key = 103)
-
-    if submit and input_text:
-        response = get_gemini_response(input_text)
-        st.session_state["Chat_history"].append(("You", input_text))
-        st.subheader("The Response is")
-        for chunk in response:
-            st.markdown(chunk.text)
-            st.session_state["Chat_history"].append(("Bot", chunk.text))
-
-    st.subheader("Chat History")
-    for role, text in st.session_state["Chat_history"]:
-        st.write(f"{role}: {text}")
-
-elif raddi == "Image Chat":
-    # Function to prepare image data
-    def prepare_image_data(uploaded_file):
+    def user_input(user_question):
+        embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        new_db=FAISS.load_local("faiss_index",embeddings)
+        docs=new_db.similarity_search(user_question)
+        chain=get_conversational_chain()
+    
+        response = chain(
+        {"input_documents":docs,"question":user_question}
+        , return_only_outputs = True
+        )
+        st.write("Reply: ", response["output_text"])
+        
+    if raddi == "Pdf Chat":
+        st.header("Chat with Multiple pdfs")
+        user_question = st.text_input("Ask a question from Pdf files")
+        
+        st.sidebar.title("Chat with pdfs")
+        pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+        if st.button("submit & process"):
+            with st.spinner("Processing..."):
+                if pdf_docs:
+                    raw_text = get_pdf_text(pdf_docs)
+                    text_chunks = get_text_chunks(raw_text)
+                    get_vector_store(text_chunks)
+                    st.success("Done")
+        
+        
+    elif raddi == "Text Chat":
+        model = genai.GenerativeModel("gemini-pro")
+        chat = model.start_chat(history=[])
+    
+        def get_gemini_response(question):
+            response = chat.send_message(question, stream=True)
+            return response
+    
+        st.header("Prajwals Pa")
+    
+        if 'Chat_history' not in st.session_state:
+            st.session_state['Chat_history'] = []
+    
+        input_text = st.text_area("Input:", key=101)
+        submit = st.button("Get Your Answer",key = 103)
+    
+        if submit and input_text:
+            response = get_gemini_response(input_text)
+            st.session_state["Chat_history"].append(("You", input_text))
+            st.subheader("The Response is")
+            for chunk in response:
+                st.markdown(chunk.text)
+                st.session_state["Chat_history"].append(("Bot", chunk.text))
+    
+        st.subheader("Chat History")
+        for role, text in st.session_state["Chat_history"]:
+            st.write(f"{role}: {text}")
+    
+    elif raddi == "Image Chat":
+        # Function to prepare image data
+        def prepare_image_data(uploaded_file):
+            if uploaded_file is not None:
+                image = Image.open(uploaded_file)
+                return image
+            else:
+                raise FileNotFoundError("No file uploaded")
+    
+        # Function to get Gemini response using image data
+        def get_gemini_response(input_prompt, image_data):
+            model = genai.GenerativeModel('gemini-pro-vision')
+            response = model.generate_content([input_prompt, image_data])
+            return response
+    
+        st.header("Chat with the Image")
+        uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    
+        if uploaded_file is None:
+            uploaded_file = st.camera_input("Take Photo")
+    
         if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            return image
-        else:
-            raise FileNotFoundError("No file uploaded")
-
-    # Function to get Gemini response using image data
-    def get_gemini_response(input_prompt, image_data):
-        model = genai.GenerativeModel('gemini-pro-vision')
-        response = model.generate_content([input_prompt, image_data])
-        return response
-
-    st.header("Chat with the Image")
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
-    if uploaded_file is None:
-        uploaded_file = st.camera_input("Take Photo")
-
-    if uploaded_file is not None:
-        image = prepare_image_data(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
-
-        submit = st.button("Tell me about the Image")
-        input_text = st.text_input("Type Your Query About The Image", key=101)
-        input_prompt = f"""
-        You are an expert in all domains. Please explain detailed information about the image: {input_text}
-        """
-        if submit:
-            response = get_gemini_response(input_prompt, image)
-            st.header("The Response is")
-            st.markdown(response.text)
+            image = prepare_image_data(uploaded_file)
+            st.image(image, caption="Uploaded Image", use_column_width=True)
+    
+            submit = st.button("Tell me about the Image")
+            input_text = st.text_input("Type Your Query About The Image", key=101)
+            input_prompt = f"""
+            You are an expert in all domains. Please explain detailed information about the image: {input_text}
+            """
+            if submit:
+                response = get_gemini_response(input_prompt, image)
+                st.header("The Response is")
+                st.markdown(response.text)
 
 
 
