@@ -64,17 +64,13 @@ def maha():
         def get_conversational_chain():
         
             prompt_template = """
-            Answer the question as detailed as possible from the provided context, make sure to provide all the details,
-            Context:\n {context}?\n
-            Question: \n{question}\n
-        
-            Answer:
+            Answer the question as detailed as possible make sure to provide correct answer 
             """
         
             model = ChatGoogleGenerativeAI(model="gemini-pro",
                                      temperature=0.3)
         
-            prompt = PromptTemplate(template = prompt_template, input_variables = ["context", "question"])
+            prompt = PromptTemplate(template = prompt_template)
             chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
         
             return chain
