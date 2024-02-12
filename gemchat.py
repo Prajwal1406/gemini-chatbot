@@ -1,4 +1,4 @@
-from Crypto.Cipher import AE
+from Crypto.Cipher import AES
 import streamlit as st
 from PyPDF2 import PdfReader
 import google.generativeai as genai
