@@ -47,8 +47,8 @@ def maha():
     
     @st.cache(allow_output_mutation=True)
     def get_vector_store(text_chunks):
-        embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-        vector_store = FAISS.from_texts(text_chunks,embeddings=embeddings)
+        your_embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        vector_store = FAISS.from_texts(text_chunks, embeddings=your_embeddings)
         vector_store.save_local('faiss_index')
     
     def get_conversational_chain():
@@ -61,7 +61,7 @@ def maha():
         return chain
     
     def user_input(user_question):
-        embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+        your_embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
         new_db=FAISS.load_local("faiss_index",embeddings)
         docs=new_db.similarity_search(user_question)
         chain=get_conversational_chain()
