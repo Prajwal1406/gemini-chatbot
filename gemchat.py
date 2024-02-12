@@ -34,7 +34,7 @@ def maha():
         with st.sidebar:
             temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
     
-        @st.cache(allow_output_mutation=True)
+        @st.cache_data(allow_output_mutation=True)
         def get_pdf_text(pdf_docs):
             text = ""
             for pdf in pdf_docs:
@@ -43,14 +43,14 @@ def maha():
                     text += page.extract_text()
             return text
     
-        @st.cache(allow_output_mutation=True)
+        @st.cache_data(allow_output_mutation=True)
         def get_text_chunks(text):
             chunk_size = 10000
             chunk_overlap = 1000
             chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size - chunk_overlap)]
             return chunks
     
-        @st.cache(allow_output_mutation=True)
+        @st.cache_resource(allow_output_mutation=True)
         def get_vector_store(text_chunks):
             your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embedding-001')
             vector_store = FAISS.from_texts(text_chunks, embedding=your_embeddings)
