@@ -52,8 +52,8 @@ def maha():
     
         @st.cache(allow_output_mutation=True)
         def get_vector_store(text_chunks):
-            your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-            vector_store = FAISS.from_texts(texts=text_chunks, embedding=your_embeddings)
+            your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embedding-001')
+            vector_store = FAISS.from_texts(text_chunks, embedding=your_embeddings)
             vector_store.save_local('faiss_index')
             return vector_store
     
@@ -67,7 +67,7 @@ def maha():
             return None  # Adjust this line based on your chain setup
     
         def user_input(user_question, temperature):
-            your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+            your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embedding-001')
             new_db = FAISS.load_local("faiss_index", embeddings=your_embeddings)
             docs = new_db.similarity_search(user_question)
             chain = get_conversational_chain(temperature)
