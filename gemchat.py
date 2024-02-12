@@ -1,7 +1,7 @@
 import streamlit as st
 from PyPDF2 import PdfReader
 import google.generativeai as genai
-from langchain_community.vectorstores import FAISS
+from langchain.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -11,6 +11,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 from dotenv import load_dotenv
 from importlib.metadata import distribution, metadata, version
 from PIL import Image
+# from langchain_google_genai import ChatGoogleGenerativeAI
 # from pdfplumber import PdfReader
 # from haystack.preprocessor.utils import RecursiveCharacterTextSplitter
 # from haystack.document_store.faiss import FAISSDocumentStore
@@ -100,36 +101,44 @@ def get_text_chunks(text):
 
 @st.cache(allow_output_mutation=True)
 def get_vector_store(text_chunks):
-    vector_store = FAISSDocumentStore(vector_dim=512, faiss_index_factory_str="Flat")
-    vector_store.write_vectors(text_chunks)
-    return vector_store
+    embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+    vector_store = FAISS.from_texts(text_chunks,embeddings=embeddings)
+    vector_store.save_local('faiss_index)
 
 def get_conversational_chain():
-    model = genai.GenerativeModel("gemini-pro")
-    chat = model.start_chat(history=[])
-    return chat
+    prompt_template="""
+        Answer the question as detailed as possible from the provided context
+        """
+    model = ChatGoogleGenerativeAI(model="gemini-pro",temprature= temperature)
+    PromptTemplate(template=prompt_template,input_variables=['context','question'])
+    chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
+    return chain
 
-def user_input(user_question, vector_store, chain):
-    docs = vector_store.query_by_embedding(user_question, top_k=5)
-    response = chain.predict(docs, user_question)
-    return response
+def user_input(user_question):
+    embeddings=GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
+    new_db=FAISS.load_local("faiss_index",embeddings)
+    docs=new_db.similarity_search(user_question)
+    chain=get_conversational_chain()
 
-if __name__ == "__main__":
-    st.header("Chat with the pdfs")
-    user_question = st.text_input("Ask a question from Pdf files")
+    response = chain(
+    {"input_documents":docs,"question":user_question}
+    , return_only_outputs = True
+    )
+    st.write("Reply: ", response["output_text"])
     
-    st.sidebar.title("Chat with pdfs")
-    pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
-    if st.button("submit & process"):
+
+st.header("Chat with Multiple pdfs")
+user_question = st.text_input("Ask a question from Pdf files")
+
+st.sidebar.title("Chat with pdfs")
+pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+if st.button("submit & process"):
+    with st.spinner("Processing..."):
         if pdf_docs:
             raw_text = get_pdf_text(pdf_docs)
             text_chunks = get_text_chunks(raw_text)
-            vector_store = get_vector_store(text_chunks)
-            chain = get_conversational_chain()
+            get_vector_store(text_chunks)
             st.success("Done")
-            if user_question:
-                response = user_input(user_question, vector_store, chain)
-                st.write("Reply: ", response)
 
 
     elif raddi == "Text Chat":
