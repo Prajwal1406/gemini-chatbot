@@ -62,7 +62,7 @@ def maha():
                 Answer the question as detailed as possible from the provided context
                 """
             model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=temperature)
-            PromptTemplate(template=prompt_template, input_variables=['context', 'question'])
+            prompt = PromptTemplate(template=prompt_template, input_variables=['context', 'question'])
             # Adjust your chain setup here
             chain = load_qa_chain(model,chain_type='stuff',prompt=prompt)
             return chain # Adjust this line based on your chain setup
