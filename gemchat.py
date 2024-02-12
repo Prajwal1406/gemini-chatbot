@@ -29,68 +29,109 @@ def maha():
     with st.sidebar:
         temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
-    if raddi == "Doc Chat":
-        @st.cache(allow_output_mutation=True)
-        def get_pdf_text(pdf_docs):
-            text = ""
-            for pdf in pdf_docs:
-                pdf_reader = PdfReader(pdf)
-                for page in pdf_reader.pages:
-                    text += page.extract_text()
-            return text
+    # if raddi == "Doc Chat":
+    #     @st.cache(allow_output_mutation=True)
+    #     def get_pdf_text(pdf_docs):
+    #         text = ""
+    #         for pdf in pdf_docs:
+    #             pdf_reader = PdfReader(pdf)
+    #             for page in pdf_reader.pages:
+    #                 text += page.extract_text()
+    #         return text
         
-        @st.cache(allow_output_mutation=True)
-        def get_text_chunks(text):
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
-            chunks = text_splitter.split(text)
-            return chunks
+    #     @st.cache(allow_output_mutation=True)
+    #     def get_text_chunks(text):
+    #         text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
+    #         chunks = text_splitter.split(text)
+    #         return chunks
         
-        @st.cache(allow_output_mutation=True)
-        def get_vector_store(text_chunks):
-            vector_store = FAISSDocumentStore(vector_dim=512, faiss_index_factory_str="Flat")
-            vector_store.write_vectors(text_chunks)
-            return vector_store
+    #     @st.cache(allow_output_mutation=True)
+    #     def get_vector_store(text_chunks):
+    #         vector_store = FAISSDocumentStore(vector_dim=512, faiss_index_factory_str="Flat")
+    #         vector_store.write_vectors(text_chunks)
+    #         return vector_store
         
-        def get_conversational_chain():
-            model = genai.GenerativeModel("gemini-pro")
-            chat = model.start_chat(history=[])
-            return chat
+    #     def get_conversational_chain():
+    #         model = genai.GenerativeModel("gemini-pro")
+    #         chat = model.start_chat(history=[])
+    #         return chat
         
-        def user_input(user_question, vector_store, chain):
-            docs = vector_store.query_by_embedding(user_question, top_k=5)
-            response = chain.predict(docs, user_question)
-            st.write("Reply: ", response)
+    #     def user_input(user_question, vector_store, chain):
+    #         docs = vector_store.query_by_embedding(user_question, top_k=5)
+    #         response = chain.predict(docs, user_question)
+    #         st.write("Reply: ", response)
         
-        if __name__ == "__main__":
-            st.header("Chat with the pdfs")
-            user_question = st.text_input("Ask a question from Pdf files")
+    #     if __name__ == "__main__":
+    #         st.header("Chat with the pdfs")
+    #         user_question = st.text_input("Ask a question from Pdf files")
+    #         if user_question:
+    #             user_input(user_question)
+        
+    #         st.sidebar.title("Chat with pdfs")
+    #         pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+    #         if st.button("submit & process"):
+    #             if pdf_docs:
+    #                 raw_text = get_pdf_text(pdf_docs)
+    #                 text_chunks = get_text_chunks(raw_text)
+    #                 vector_store = get_vector_store(text_chunks)
+    #                 chain = get_conversational_chain()
+    #                 st.success("Done")
+
+    import streamlit as st
+from PyPDF2 import PdfReader
+from haystack.retriever.dense import DensePassageRetriever
+from haystack.document_store.faiss import FAISSDocumentStore
+import genai
+
+@st.cache(allow_output_mutation=True)
+def get_pdf_text(pdf_docs):
+    text = ""
+    for pdf in pdf_docs:
+        pdf_reader = PdfReader(pdf)
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+    return text
+
+@st.cache(allow_output_mutation=True)
+def get_text_chunks(text):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
+    chunks = text_splitter.split(text)
+    return chunks
+
+@st.cache(allow_output_mutation=True)
+def get_vector_store(text_chunks):
+    vector_store = FAISSDocumentStore(vector_dim=512, faiss_index_factory_str="Flat")
+    vector_store.write_vectors(text_chunks)
+    return vector_store
+
+def get_conversational_chain():
+    model = genai.GenerativeModel("gemini-pro")
+    chat = model.start_chat(history=[])
+    return chat
+
+def user_input(user_question, vector_store, chain):
+    docs = vector_store.query_by_embedding(user_question, top_k=5)
+    response = chain.predict(docs, user_question)
+    return response
+
+if __name__ == "__main__":
+    st.header("Chat with the pdfs")
+    user_question = st.text_input("Ask a question from Pdf files")
+    
+    st.sidebar.title("Chat with pdfs")
+    pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+    if st.button("submit & process"):
+        if pdf_docs:
+            raw_text = get_pdf_text(pdf_docs)
+            text_chunks = get_text_chunks(raw_text)
+            vector_store = get_vector_store(text_chunks)
+            chain = get_conversational_chain()
+            st.success("Done")
             if user_question:
-                user_input(user_question)
-        
-            st.sidebar.title("Chat with pdfs")
-            pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
-            if st.button("submit & process"):
-                if pdf_docs:
-                    raw_text = get_pdf_text(pdf_docs)
-                    text_chunks = get_text_chunks(raw_text)
-                    vector_store = get_vector_store(text_chunks)
-                    chain = get_conversational_chain()
-                    st.success("Done")
+                response = user_input(user_question, vector_store, chain)
+                st.write("Reply: ", response)
 
-    # st.header("Text Chat")
-    # chat_history = st.session_state.get("Chat_history", [])
-    # input_text = st.text_area("Input:")
-    # submit = st.button("Get Your Answer")
-    # if submit and input_text:
-    #     response = get_gemini_response(input_text, chat_history)
-    #     st.subheader("The Response is")
-    #     for chunk in response:
-    #         st.markdown(chunk.text)
-    #         chat_history.append(("Bot", chunk.text))
 
-    # st.subheader("Chat History")
-    # for role, text in chat_history:
-    #     st.write(f"{role}: {text}")
     elif raddi == "Text Chat":
         model = genai.GenerativeModel("gemini-pro")
         chat = model.start_chat(history=[])
