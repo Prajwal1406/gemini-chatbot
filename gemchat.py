@@ -30,9 +30,9 @@ def maha():
     with st.sidebar:
         temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
-    if raddi == "Doc Chat":
-        with st.sidebar:
-            temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
+if raddi == "Doc Chat":
+    with st.sidebar:
+        temperature = st.slider("How much creative you want", 0.0, 1.0, 0.1)
 
     @st.cache(allow_output_mutation=True)
     def get_pdf_text(pdf_docs):
@@ -78,21 +78,21 @@ def maha():
         )
         st.write("Reply: ", response["output_text"])
 
-        st.header("Chat with Multiple pdfs")
-        user_question = st.text_input("Ask a question from Pdf files")
-    
-        st.sidebar.title("Chat with pdfs")
-        pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
-    
-        if st.button("submit & process"):
-            with st.spinner("Processing..."):
-                if pdf_docs:
-                    raw_text = get_pdf_text(pdf_docs)
-                    text_chunks = get_text_chunks(raw_text)
-                    get_vector_store(text_chunks)
-                    st.success("Done")
-                    if user_question:
-                        user_input(user_question, temperature)
+    st.header("Chat with Multiple pdfs")
+    user_question = st.text_input("Ask a question from Pdf files")
+
+    st.sidebar.title("Chat with pdfs")
+    pdf_docs = st.file_uploader("Upload Your Pdf files and click submit", type="pdf", accept_multiple_files=True)
+
+    if st.button("submit & process"):
+        with st.spinner("Processing..."):
+            if pdf_docs:
+                raw_text = get_pdf_text(pdf_docs)
+                text_chunks = get_text_chunks(raw_text)
+                get_vector_store(text_chunks)
+                st.success("Done")
+                if user_question:
+                    user_input(user_question, temperature)
         
         
     elif raddi == "Text Chat":
