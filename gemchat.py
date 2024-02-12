@@ -53,7 +53,7 @@ def maha():
         @st.cache(allow_output_mutation=True)
         def get_vector_store(text_chunks):
             your_embeddings = GoogleGenerativeAIEmbeddings(model='models/embeddings-001')
-            vector_store = FAISS.from_texts(text_chunks, embeddings=your_embeddings)
+            vector_store = FAISS.from_texts(texts=text_chunks, embeddings=your_embeddings)
             vector_store.save_local('faiss_index')
             return vector_store
     
