@@ -78,10 +78,10 @@ def maha():
     #                 chain = get_conversational_chain()
     #                 st.success("Done")
 
-    import streamlit as st
+import streamlit as st
 from PyPDF2 import PdfReader
-from haystack.retriever.dense import DensePassageRetriever
-from haystack.document_store.faiss import FAISSDocumentStore
+# from haystack.retriever.dense import DensePassageRetriever
+# from haystack.document_store.faiss import FAISSDocumentStore
 import genai
 
 @st.cache(allow_output_mutation=True)
