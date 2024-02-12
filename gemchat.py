@@ -126,7 +126,7 @@ def maha():
         )
         st.write("Reply: ", response["output_text"])
         
-    if raddi == "Pdf Chat":
+    if raddi == "Doc Chat":
         st.header("Chat with Multiple pdfs")
         user_question = st.text_input("Ask a question from Pdf files")
         
